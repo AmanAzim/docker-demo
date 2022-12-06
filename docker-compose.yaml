@@ -1,0 +1,29 @@
+version: "3" # latest version of docker-compose
+services:
+  # my-app:
+  # image: ${docker-registry}/my-app:1.0
+  # ports:
+  # - 3000:3000
+  my_mongodb: # the custome name for the container that that docker compose will use to generate a unique container name
+    image: mongo:4.1.6
+    ports:
+      - 27018:27018
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/data/db # On restart all the data from mongo-data will be copied in to /data/db and on stopping the containber /data/db will write all the data into mongo-data to keep persistancy
+    # networks: // by default docker-compose creates networks itself under which all of its containers run but we can also specify network name
+    # - docker-test-learn
+  mongo-express:
+    image: mongo-express
+    restart: always # fixes MongoNetworkError when my_mongodb is not ready when mongo-express starts
+    ports:
+      - 8082:8082
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=my_mongodb
+volumes:
+  mongo-data: # Name reference of Volume defined in host which we will use for different container
+    driver: local # instruct docker to create storage in local file system

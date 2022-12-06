@@ -1,0 +1,28 @@
+version: "3" # latest version of docker-compose
+services:
+  docker-test-app: # our build image name that holds the node js server (need to build image first using Dockerfile)
+    image: docker-test-app:1.0 # Reading local image directly using imageName:tag # ${docker-registry}/my-app:1.0 // url of the Image from AWS docker repository
+    ports:
+      - 3000:3000
+  my_mongodb:
+    image: mongo:4.1.6
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=my_mongodb
+volumes:
+  mongo-data:
+    driver: local
